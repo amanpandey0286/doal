@@ -1,9 +1,21 @@
 import 'package:doal/pages/sign_in_page.dart';
 import 'package:flutter/material.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+
+  final _formkey = GlobalKey<FormState>();
+  var _username = '';
+  var _email = '';
+  var _password = '';
+
+  
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -12,8 +24,8 @@ class SignUpPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              const Padding(
+                padding: EdgeInsets.all(16.0),
                 child: Text(
                   "Doal",
                   style: TextStyle(
@@ -44,74 +56,110 @@ class SignUpPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 10.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40.0,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Name",
-                            hintText: "Enter your name"),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Email",
-                            hintText: "Enter your Email"),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Password",
-                            hintText: "Enter your Password"),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          SizedBox(
-                            width: 100.0,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/SignIn');
-                            },
-                            child: Text("Already a User?"),
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/Home');
-                        },
-                        child: Text(
-                          "Sing up",
-                          style: TextStyle(fontSize: 20.0),
+                  child: Form(
+                    key: _formkey,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40.0,
                         ),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(StadiumBorder()),
-                          fixedSize: MaterialStateProperty.all(
-                            Size(120, 50),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
+                              labelText: "Name",
+                              hintText: "Enter your name"),
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey('username'),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Incorrect Username';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _username = value!;
+                          },
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
+                              labelText: "Email",
+                              hintText: "Enter your Email"),
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey('email'),
+                          validator: (value) {
+                            if (value!.isEmpty || !value.contains('@')) {
+                              return 'Incorrect Email';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _email = value!;
+                          },
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
+                              labelText: "Password",
+                              hintText: "Enter your Password"),
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey('password'),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Incorrect Password';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _password = value!;
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              width: 100.0,
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/SignIn');
+                              },
+                              child: Text("Already a User?"),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/Home');
+                          },
+                          child: Text(
+                            "Sing up",
+                            style: TextStyle(fontSize: 20.0),
+                          ),
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(StadiumBorder()),
+                            fixedSize: MaterialStateProperty.all(
+                              Size(120, 50),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      )
-                    ],
+                        SizedBox(
+                          height: 10.0,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

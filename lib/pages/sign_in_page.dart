@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final _formkey = GlobalKey<FormState>();
+  var _email = '';
+  var _password = '';
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -43,71 +51,96 @@ class SignInPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 10.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40.0,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Email",
-                            hintText: "Enter your Email"),
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Password",
-                            hintText: "Enter your Password"),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const SizedBox(
-                            width: 100.0,
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text("Forgot Password?"),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/');
-                        },
-                        child: Text(
-                          "Back to Sign up >",
-                          style: TextStyle(fontSize: 15.0),
+                  child: Form(
+                    key: _formkey,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40.0,
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/Home');
-                        },
-                        child: Text(
-                          "Sing In",
-                          style: TextStyle(fontSize: 20.0),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
+                              labelText: "Email",
+                              hintText: "Enter your Email"),
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey('email'),
+                          validator: (value) {
+                            if (value!.isEmpty || !value.contains('@')) {
+                              return 'Incorrect Email';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _email = value!;
+                          },
                         ),
-                        style: ButtonStyle(
-                          shape: MaterialStateProperty.all(StadiumBorder()),
-                          fixedSize: MaterialStateProperty.all(
-                            Size(120, 50),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
+                              labelText: "Password",
+                              hintText: "Enter your Password"),
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey('password'),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Incorrect Password';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _password = value!;
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const SizedBox(
+                              width: 100.0,
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Text("Forgot Password?"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/');
+                          },
+                          child: Text(
+                            "Back to Sign up >",
+                            style: TextStyle(fontSize: 15.0),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 30.0,
-                      )
-                    ],
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/Home');
+                          },
+                          child: Text(
+                            "Sing In",
+                            style: TextStyle(fontSize: 20.0),
+                          ),
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(StadiumBorder()),
+                            fixedSize: MaterialStateProperty.all(
+                              Size(120, 50),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30.0,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

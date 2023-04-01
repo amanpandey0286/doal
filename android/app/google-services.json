@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "982760766614",
+    "project_id": "doal-d8e83",
+    "storage_bucket": "doal-d8e83.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982760766614:android:b778d25bcc1b64c6f096b7",
+        "android_client_info": {
+          "package_name": "com.amanpandey.doal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "982760766614-qkh4ifti1q3vsq7c1h5bn9imiod5h20p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkvVcOQsLz2hJRdDu0FwKpQMFkaY6vAQQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "982760766614-qkh4ifti1q3vsq7c1h5bn9imiod5h20p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
