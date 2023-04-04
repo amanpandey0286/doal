@@ -1,4 +1,9 @@
+import 'package:doal/pages/home_page.dart';
+import 'package:doal/pages/sign_up_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -11,6 +16,28 @@ class _SignInPageState extends State<SignInPage> {
   final _formkey = GlobalKey<FormState>();
   var _email = '';
   var _password = '';
+
+  startauthentication() {
+    final validity = _formkey.currentState!.validate();
+    FocusScope.of(context).unfocus();
+
+    if (validity) {
+      _formkey.currentState!.save();
+      submitform(_email, _password);
+    }
+  }
+
+  submitform(String email, String password) async {
+    final auth = FirebaseAuth.instance;
+    UserCredential authResult;
+    try {
+      authResult = await auth.signInWithEmailAndPassword(
+          email: email, password: password);
+    } catch (err) {
+      print(err);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -85,7 +112,7 @@ class _SignInPageState extends State<SignInPage> {
                                   borderRadius: BorderRadius.circular(50.0)),
                               labelText: "Password",
                               hintText: "Enter your Password"),
-                          keyboardType: TextInputType.emailAddress,
+                          obscureText: true,
                           key: ValueKey('password'),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -114,7 +141,11 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpPage()),
+                            );
                           },
                           child: Text(
                             "Back to Sign up >",
@@ -123,7 +154,12 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/Home');
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => const HomePage()),
+                            // );
+                            startauthentication();
                           },
                           child: Text(
                             "Sing In",
