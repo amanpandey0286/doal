@@ -9,7 +9,7 @@ class TodoWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         height: 80.0,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20.0)),
           gradient: LinearGradient(
             colors: [
@@ -26,8 +26,8 @@ class TodoWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.task_alt_outlined,
                   size: 40.0,
@@ -36,7 +36,7 @@ class TodoWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+                children: const [
                   Text(
                     "ToDo title",
                     style: TextStyle(
@@ -52,13 +52,13 @@ class TodoWidget extends StatelessWidget {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20.0,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+                children:const [
                   Text(
                     "Start Date",
                     style: TextStyle(
