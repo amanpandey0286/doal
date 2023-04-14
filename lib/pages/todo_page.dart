@@ -3,6 +3,7 @@ import 'package:doal/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 class ToDoPage extends StatefulWidget {
   const ToDoPage({super.key});
@@ -29,14 +30,15 @@ class _ToDoPageState extends State<ToDoPage> {
         .set({
       'title': titleController.text,
       'description': descriptionController.text,
-      'time': _timeOfDay.hour,
-      'date': _dateTime,
+      'time': _timeOfDay.format(context),
+      'date': _dateTime.microsecondsSinceEpoch,
     });
     Fluttertoast.showToast(msg: 'Data Added');
   }
 
   DateTime _dateTime = DateTime.now();
   TimeOfDay _timeOfDay = TimeOfDay(hour: 8, minute: 30);
+  
 
   void _showDatePicker() {
     showDatePicker(
@@ -180,14 +182,14 @@ class _ToDoPageState extends State<ToDoPage> {
                     ),
                     onPressed: () {},
                     child: Row(
-                      children: [
-                        const Text(
+                      children: const [
+                        Text(
                           "Study",
                           style: TextStyle(
                             fontSize: 20.0,
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: 20.0,
                         ),
                         Icon(Icons.arrow_downward),
