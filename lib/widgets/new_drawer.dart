@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NewDrawer extends StatelessWidget {
@@ -179,19 +180,21 @@ class NewDrawer extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.settings,
+                          Icons.logout,
                           color: Colors.white,
                         ),
                         SizedBox(
                           width: 20.0,
                         ),
                         Text(
-                          "Settings",
+                          "Log Out",
                           style: TextStyle(fontSize: 20.0, color: Colors.white),
                         )
                       ],

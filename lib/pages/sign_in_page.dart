@@ -1,6 +1,7 @@
 import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,8 +34,13 @@ class _SignInPageState extends State<SignInPage> {
     try {
       authResult = await auth.signInWithEmailAndPassword(
           email: email, password: password);
-    } catch (err) {
-      print(err);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 
@@ -154,15 +160,10 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => const HomePage()),
-                            // );
                             startauthentication();
                           },
                           child: Text(
-                            "Sing In",
+                            "Sign In",
                             style: TextStyle(fontSize: 20.0),
                           ),
                           style: ButtonStyle(

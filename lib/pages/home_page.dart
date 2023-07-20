@@ -138,12 +138,12 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 20.0,
                                     ),
                                   ),
-                                  Text(
-                                    docs[index]['date'].toString(),
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                    ),
-                                  )
+                                  // Text(
+                                  //   docs[index]['date'].toString(),
+                                  //   style: TextStyle(
+                                  //     fontSize: 20.0,
+                                  //   ),
+                                  // )
                                 ],
                               ),
                             ],

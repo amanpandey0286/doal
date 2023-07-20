@@ -4,6 +4,8 @@ import 'package:doal/pages/sign_in_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/card_button.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -38,8 +40,9 @@ class _SignUpPageState extends State<SignUpPage> {
           .collection('users')
           .doc(uid)
           .set({'username': username, 'email': email});
-    } catch (err) {
-      print(err);
+    } catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 
@@ -63,11 +66,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              Container(
+              SizedBox(
                 child: Image.asset("assets/images/login_anim.gif"),
                 height: 250.0,
               ),
               Container(
+                //height: 5000,
                 decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -82,13 +86,24 @@ class _SignUpPageState extends State<SignUpPage> {
                         topRight: Radius.circular(60.0))),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 40.0, vertical: 10.0),
+                      horizontal: 30.0, vertical: 10.0),
                   child: Form(
                     key: _formkey,
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 40.0,
+                        const SizedBox(
+                          height: 20.0,
+                        ),
+                        CardButton(),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        const Text(
+                          "OR",
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(
+                          height: 8,
                         ),
                         TextFormField(
                           decoration: InputDecoration(
@@ -108,7 +123,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             _username = value!;
                           },
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10.0,
                         ),
                         TextFormField(
@@ -129,7 +144,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             _email = value!;
                           },
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10.0,
                         ),
                         TextFormField(
@@ -153,7 +168,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 100.0,
                             ),
                             TextButton(
@@ -168,15 +183,15 @@ class _SignUpPageState extends State<SignUpPage> {
                             )
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10.0,
                         ),
                         ElevatedButton(
                           onPressed: () {
                             startauthentication();
                           },
-                          child: Text(
-                            "Sing up",
+                          child: const Text(
+                            "Sign up",
                             style: TextStyle(fontSize: 20.0),
                           ),
                           style: ButtonStyle(
@@ -186,9 +201,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        )
+                        const SizedBox(
+                          height: 50.0,
+                        ),
                       ],
                     ),
                   ),
