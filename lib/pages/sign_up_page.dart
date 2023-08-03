@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doal/auth/google_auth.dart';
 import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_in_page.dart';
+import 'package:doal/widgets/card_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/card_button.dart';
-
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({super.key, required String email});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -18,6 +18,8 @@ class _SignUpPageState extends State<SignUpPage> {
   var _username = '';
   var _email = '';
   var _password = '';
+
+  GoogleAuthClass googleAuthClass = GoogleAuthClass();
 
   startauthentication() {
     final validity = _formkey.currentState!.validate();
@@ -48,9 +50,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Color(0xff29274F),
-      child: SafeArea(
+    return Scaffold(
+      backgroundColor: Color(0xff29274F),
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -94,7 +96,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(
                           height: 20.0,
                         ),
-                        CardButton(),
+                        InkWell(
+                            onTap: () async {
+                              await googleAuthClass.googleSignIn(
+                                  context, _email);
+                            },
+                            child: CardButton()),
                         const SizedBox(
                           height: 8,
                         ),
@@ -112,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               labelText: "Name",
                               hintText: "Enter your name"),
                           keyboardType: TextInputType.emailAddress,
-                          key: ValueKey('username'),
+                          key: const ValueKey('username'),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Incorrect Username';

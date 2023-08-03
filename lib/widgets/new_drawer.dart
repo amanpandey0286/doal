@@ -1,3 +1,4 @@
+import 'package:doal/pages/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -182,6 +183,13 @@ class NewDrawer extends StatelessWidget {
                 child: TextButton(
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => SignUpPage(
+                                    email: '',
+                                  )),
+                          (route) => false);
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,

@@ -38,7 +38,6 @@ class _ToDoPageState extends State<ToDoPage> {
 
   DateTime _dateTime = DateTime.now();
   TimeOfDay _timeOfDay = TimeOfDay(hour: 8, minute: 30);
-  
 
   void _showDatePicker() {
     showDatePicker(
@@ -75,9 +74,13 @@ class _ToDoPageState extends State<ToDoPage> {
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
           child: Column(
             children: [
+              SizedBox(height: 20.0),
               Text(
                 "New Work",
-                style: TextStyle(fontSize: 30.0, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                    fontSize: 30.0,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w800),
               ),
               SizedBox(
                 height: 15.0,
@@ -94,13 +97,13 @@ class _ToDoPageState extends State<ToDoPage> {
               SizedBox(
                 height: 5.0,
               ),
-              const Divider(
-                height: 20,
-                thickness: 1,
-                indent: 10.0,
-                endIndent: 10.0,
-                color: Colors.deepOrange,
-              ),
+              // const Divider(
+              //   height: 20,
+              //   thickness: 1,
+              //   indent: 10.0,
+              //   endIndent: 10.0,
+              //   color: Colors.deepOrange,
+              // ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -216,7 +219,7 @@ class _ToDoPageState extends State<ToDoPage> {
                   ),
                 ),
                 height: 200.0,
-                width: double.infinity,
+                width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [

@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData) {
             return HomePage();
           } else {
-            return SignUpPage();
+            return SignUpPage(email: '',);
           }
         },
       ),
