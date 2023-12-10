@@ -4,8 +4,18 @@ class GoogleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      //width: MediaQuery.of(context).size.width,
+      
+      height: 60,
+      
       child: Card(
+        elevation: 0,
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+            side: const BorderSide(
+              width: 1,
+              color: Colors.white70,
+            )),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
@@ -22,16 +32,7 @@ class GoogleButton extends StatelessWidget {
             ],
           ),
         ),
-        elevation: 0,
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-            side: const BorderSide(
-              width: 1,
-              color: Colors.white70,
-            )),
       ),
-      height: 60,
     );
   }
 }

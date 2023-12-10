@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ToDoWidget extends StatelessWidget {
-  const ToDoWidget({
-    Key? key,
-  }) : super(key: key);
+  ToDoWidget(
+      {required this.due_date, required this.due_time, required this.title});
+  var due_date = '';
+  var due_time = '';
+  var title = '';
+  var workspace = '';
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +14,7 @@ class ToDoWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         height: 80.0,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(20.0)),
           gradient: LinearGradient(
             colors: [
@@ -62,7 +65,7 @@ class ToDoWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: const [
                   Text(
-                    "Start Date",
+                    "Due Time",
                     style: TextStyle(
                       fontSize: 20.0,
                     ),

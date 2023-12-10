@@ -9,8 +9,8 @@ class common_widget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 35.0),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 35.0),
           child: Text(
             "Doal",
             style: TextStyle(
@@ -22,8 +22,8 @@ class common_widget extends StatelessWidget {
           ),
         ),
         SizedBox(
-          child: Image.asset("assets/images/login_anim.gif"),
           height: 250.0,
+          child: Image.asset("assets/images/login_anim.gif"),
         ),
       ],
     );
