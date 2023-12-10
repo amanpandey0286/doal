@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:doal/utils/routes.dart';
+import 'package:doal/utils/theme.dart';
 import 'package:doal/widgets/to_do_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +33,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFF3E3A6D),
+        backgroundColor: MyTheme.MyThemeData().primaryColor,
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, MyRoutes.addtodo);
+        },
       ),
       appBar: AppBar(
         title: const Text(
@@ -71,6 +75,16 @@ class _HomePageState extends State<HomePage> {
             );
           }
         }),
+      ),
+      bottomNavigationBar: CurvedNavigationBar(
+        items: [
+          Icon(Icons.calendar_view_day),
+          Icon(Icons.all_inbox),
+          Icon(Icons.home),
+        ],
+        backgroundColor:
+            MyTheme.MyThemeData().scaffoldBackgroundColor, //Color(0xff29274F),
+        color: MyTheme.MyThemeData().primaryColor,
       ),
     );
   }

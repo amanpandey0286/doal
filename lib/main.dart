@@ -1,6 +1,7 @@
 import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_in_page.dart';
 import 'package:doal/pages/sign_up_page.dart';
+import 'package:doal/pages/to_do_add_page.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,11 @@ class MyApp extends StatelessWidget {
       theme: MyTheme.MyThemeData(),
       routes: {
         MyRoutes.homeRoute: (context) => HomePage(),
-        MyRoutes.SignUpRoute: (context) => SignUpPage(
+        MyRoutes.signUpRoute: (context) => SignUpPage(
               email: '',
             ),
-        MyRoutes.SignInRoute: (context) => SignInPage(),
+        MyRoutes.signInRoute: (context) => SignInPage(),
+        MyRoutes.addtodo :(context) => AddToDoWidget(),
       },
     );
   }

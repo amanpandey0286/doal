@@ -178,7 +178,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, MyRoutes.SignUpRoute);
+                            Navigator.pushNamed(context, MyRoutes.signUpRoute);
                           },
                           child: const Text(
                             "Back to Sign up >",

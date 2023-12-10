@@ -139,7 +139,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Expanded(child: Container()),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, MyRoutes.SignInRoute);
+                          Navigator.pushNamed(context, MyRoutes.signInRoute);
                         },
                         child: const Text(
                           "Already a User?",

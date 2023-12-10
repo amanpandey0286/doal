@@ -41,9 +41,9 @@ class ToDoWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
+                children: [
                   Text(
-                    "ToDo title",
+                    title,
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -63,15 +63,15 @@ class ToDoWidget extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
+                children: [
                   Text(
-                    "Due Time",
+                    due_time,
                     style: TextStyle(
                       fontSize: 20.0,
                     ),
                   ),
                   Text(
-                    "Due Date",
+                    due_date,
                     style: TextStyle(
                       fontSize: 20.0,
                     ),
