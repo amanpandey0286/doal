@@ -44,14 +44,14 @@ class ToDoWidget extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     "Workspace",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20.0,
                     ),
                   )
@@ -66,13 +66,13 @@ class ToDoWidget extends StatelessWidget {
                 children: [
                   Text(
                     due_time,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20.0,
                     ),
                   ),
                   Text(
                     due_date,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20.0,
                     ),
                   )

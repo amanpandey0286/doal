@@ -1,3 +1,4 @@
+import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_up_page.dart';
 import 'package:doal/utils/auth.dart';
 import 'package:doal/utils/routes.dart';
@@ -18,9 +19,9 @@ class _SignInPageState extends State<SignInPage> {
   var _email = '';
   var _password = '';
 
-  GoogleAuthClass googleAuthClass = GoogleAuthClass();
+   GoogleAuthClass googleAuthClass = GoogleAuthClass();
 
-  void startauthentication() {
+  startauthentication() {
     final validity = _formkey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
@@ -33,36 +34,16 @@ class _SignInPageState extends State<SignInPage> {
   submitform(String email, String password) async {
     final auth = FirebaseAuth.instance;
     UserCredential authResult;
-
     try {
       authResult = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+          email: email, password: password);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
-
-      // If sign-in with email and password is successful, navigate to the home page or the desired screen.
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const HomePage()),
-
-      // );
     } catch (e) {
-      // If sign-in with email and password fails, show an error message and let GoogleAuthClass handle Google sign-in.
       final snackbar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      return; // Return here to prevent the Google sign-in from being triggered if email-password sign-in failed.
-    }
-
-    // If sign-in was successful or account already linked, navigate to the home page.
-    if (authResult.user != null ||
-        await googleAuthClass.isGoogleAccountLinked(email)) {
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const HomePage()),
-      // );
-    } else {
-      // If the user signed in with email but hasn't linked the Google account, let them link the account.
-      googleAuthClass.googleSignIn(context, email);
     }
   }
 
