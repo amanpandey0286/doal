@@ -1,10 +1,8 @@
-import 'package:doal/pages/home_page.dart';
-import 'package:doal/pages/sign_up_page.dart';
 import 'package:doal/utils/auth.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/widgets/common_widget.dart';
 import 'package:doal/widgets/google_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -15,37 +13,13 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final _formkey = GlobalKey<FormState>();
-  var _email = '';
-  var _password = '';
+  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _pwdController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  bool circular = false;
 
-   GoogleAuthClass googleAuthClass = GoogleAuthClass();
-
-  startauthentication() {
-    final validity = _formkey.currentState!.validate();
-    FocusScope.of(context).unfocus();
-
-    if (validity) {
-      _formkey.currentState!.save();
-      submitform(_email, _password);
-    }
-  }
-
-  submitform(String email, String password) async {
-    final auth = FirebaseAuth.instance;
-    UserCredential authResult;
-    try {
-      authResult = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } catch (e) {
-      final snackbar = SnackBar(content: Text(e.toString()));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
-  }
+  GoogleAuthClass googleAuthClass = GoogleAuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +28,7 @@ class _SignInPageState extends State<SignInPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              common_widget(),
+              const common_widget(),
               Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -73,15 +47,14 @@ class _SignInPageState extends State<SignInPage> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 30.0, vertical: 30.0),
                   child: Form(
-                    key: _formkey,
                     child: Column(
                       children: [
                         InkWell(
                             onTap: () async {
                               await googleAuthClass.googleSignIn(
-                                  context, _email);
+                                  context, _emailController.toString());
                             },
-                            child: GoogleButton()),
+                            child: const GoogleButton()),
                         const Text(
                           "OR",
                           style: TextStyle(fontWeight: FontWeight.w500),
@@ -90,42 +63,51 @@ class _SignInPageState extends State<SignInPage> {
                           height: 8,
                         ),
                         TextFormField(
+                          controller: _emailController,
                           decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                                borderSide: BorderSide(
+                                  color: Colors.white30,
+                                  width: 2.0,
+                                ),
+                              ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50.0)),
                               labelText: "Email",
                               hintText: "Enter your Email"),
                           keyboardType: TextInputType.emailAddress,
-                          key: ValueKey('email'),
+                          key: const ValueKey('email'),
                           validator: (value) {
                             if (value!.isEmpty || !value.contains('@')) {
                               return 'Incorrect Email';
                             }
                             return null;
                           },
-                          onSaved: (value) {
-                            _email = value!;
-                          },
                         ),
                         const SizedBox(
                           height: 10.0,
                         ),
                         TextFormField(
+                          controller: _pwdController,
                           decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                                borderSide: BorderSide(
+                                  color: Colors.white24,
+                                  width: 2.0,
+                                ),
+                              ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50.0)),
                               labelText: "Password",
                               hintText: "Enter your Password"),
                           obscureText: true,
-                          key: ValueKey('password'),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Incorrect Password';
                             }
                             return null;
-                          },
-                          onSaved: (value) {
-                            _password = value!;
                           },
                         ),
                         Row(
@@ -179,20 +161,40 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            startauthentication();
+                          onPressed: () async {
+                            try {
+                              firebase_auth.UserCredential userCredential =
+                                  await firebaseAuth.signInWithEmailAndPassword(
+                                      email: _emailController.text,
+                                      password: _pwdController.text);
+                              print(userCredential.user!.email);
+                              setState(() {
+                                circular = false;
+                              });
+                              Navigator.pushNamed(context, MyRoutes.homeRoute);
+                            } catch (e) {
+                              final snackbar =
+                                  SnackBar(content: Text(e.toString()));
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackbar);
+                              setState(() {
+                                circular = false;
+                              });
+                            }
                           },
                           style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                                 const StadiumBorder()),
                             fixedSize: MaterialStateProperty.all(
-                              Size(120, 50),
+                              const Size(120, 50),
                             ),
                           ),
-                          child: const Text(
-                            "Sign In",
-                            style: TextStyle(fontSize: 20.0),
-                          ),
+                          child: circular
+                              ? const CircularProgressIndicator()
+                              : const Text(
+                                  "Sign In",
+                                  style: TextStyle(fontSize: 20.0),
+                                ),
                         ),
                         const SizedBox(
                           height: 10.0,

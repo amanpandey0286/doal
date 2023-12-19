@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ToDoWidget extends StatelessWidget {
   ToDoWidget(
-      {required this.due_date, required this.due_time, required this.title});
+      {super.key, required this.due_date,
+      required this.due_time,
+      required this.title,
+      required this.check});
   var due_date = '';
   var due_time = '';
   var title = '';
   var workspace = '';
+  final bool check;
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +36,24 @@ class ToDoWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.task_alt_outlined,
-                  size: 40.0,
-                ),
-              ),
+              Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Transform.scale(
+                    scale: 1.5,
+                    child: Checkbox(
+                      fillColor: MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return const Color(0xFFC63956);
+                        }
+                        return const Color(0xFFC63956);
+                      }),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)),
+                      onChanged: (bool? value) {},
+                      value: false,
+                    ),
+                  )),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,9 +65,9 @@ class ToDoWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "Workspace",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20.0,
                     ),
                   )

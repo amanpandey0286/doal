@@ -3,6 +3,7 @@ import 'package:doal/utils/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 
 class AddToDoWidget extends StatefulWidget {
   const AddToDoWidget({super.key});
@@ -14,25 +15,36 @@ class AddToDoWidget extends StatefulWidget {
 class _AddToDoWidgetState extends State<AddToDoWidget> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  bool impCheck = false;
+  bool remCheck = false;
 
-  addtasktofirebase() async {
+  String generateTaskId() {
+    // Using a combination of date, time, and user ID to create a unique ID
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    String taskId =
+        '$uid-${_dateTime.microsecondsSinceEpoch}-${_timeOfDay.toString()}';
+    return taskId;
+  }
+
+  Future<void> addTaskToFirebase() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = await auth.currentUser;
-    String uid = user!.uid;
-    var date = _dateTime;
-    var time = _timeOfDay;
-    await FirebaseFirestore.instance
-        .collection('tasks')
-        .doc(uid)
-        .collection('mytasks')
-        .doc(time.toString()) //align according to this.
-        .set({
-      'title': titleController.text,
-      'description': descriptionController.text,
-      'time': _timeOfDay.format(context),
-      'date': _dateTime.microsecondsSinceEpoch,
-    });
-    Fluttertoast.showToast(msg: 'Data Added');
+    final User? user = auth.currentUser;
+
+    if (user != null) {
+      String uid = user.uid;
+      String taskId = generateTaskId();
+
+      await FirebaseFirestore.instance.collection('Todo').add({
+        'title': titleController.text,
+        'description': descriptionController.text,
+        'time': _timeOfDay.format(context),
+        'date': _dateTime.microsecondsSinceEpoch,
+        'impCheck': impCheck,
+        'remCheck': remCheck,
+      });
+
+      Fluttertoast.showToast(msg: 'Data Added');
+    }
   }
 
   DateTime _dateTime = DateTime.now();
@@ -60,7 +72,6 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
         _timeOfDay = value!;
       });
     });
-    ;
   }
 
   @override
@@ -100,49 +111,61 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                   const SizedBox(
                     height: 16.0,
                   ),
-                  TextFormField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.0)),
-                        labelText: " Todo title ",
-                        prefixIcon: const Icon(Icons.add_task_outlined),
-                        hintText: "Enter your to do title"),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                            borderSide: const BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(50.0)),
+                          labelText: " Todo title ",
+                          prefixIcon: const Icon(Icons.add_task_outlined),
+                          hintText: "Enter your to do title"),
+                    ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         const Icon(Icons.date_range_rounded),
-                        const Text("Due Date",
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                        const Text("Set Date",
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        const SizedBox(
-                          width: 100.0,
-                        ),
+                        Expanded(child: Container()),
                         TextButton(
-                            onPressed: _showDatePicker,
-                            child: Text(
-                              _dateTime.day.toString(),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 18.0),
-                            ))
+                          onPressed: _showDatePicker,
+                          child: Text(
+                            _dateTime.day.toString(),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18.0),
+                          ),
+                        )
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         const Icon(Icons.timer_sharp),
+                        const SizedBox(
+                          width: 10.0,
+                        ),
                         const Text("Set Time",
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        const SizedBox(
-                          width: 100.0,
-                        ),
+                        Expanded(child: Container()),
                         TextButton(
                             onPressed: _showTimePicker,
                             child: Text(
@@ -153,37 +176,103 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                       ],
                     ),
                   ),
-                  Container(
-                    height: 200.0,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF555294),
-                            Color(0xFF3E3A6D),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          stops: [0.1, 0.9],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_border_purple500_sharp),
+                        const SizedBox(
+                          width: 10.0,
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        minLines: 8,
-                        maxLines: 8,
-                        controller: descriptionController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            labelText: " To Do Description ",
-                            hintText: "Enter your to do description"),
+                        const Text("Important",
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold)),
+                        Expanded(child: Container()),
+                        Transform.scale(
+                          scale: 0.6,
+                          child: LiteRollingSwitch(
+                            value: false,
+                            textOn: 'enabled',
+                            textOff: 'disabled',
+                            colorOn: Colors.greenAccent,
+                            colorOff: Colors.redAccent,
+                            iconOn: Icons.done,
+                            iconOff: Icons.close,
+                            textSize: 16.0,
+                            onChanged: ((p0) {}),
+                            onDoubleTap: () {},
+                            onSwipe: () {},
+                            onTap: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_border_purple500_sharp),
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                        const Text("Important",
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold)),
+                        Expanded(child: Container()),
+                        Transform.scale(
+                          scale: 0.6,
+                          child: LiteRollingSwitch(
+                            value: false,
+                            textOn: 'enabled',
+                            textOff: 'disabled',
+                            colorOn: Colors.greenAccent,
+                            colorOff: Colors.redAccent,
+                            iconOn: Icons.done,
+                            iconOff: Icons.close,
+                            textSize: 16.0,
+                            onChanged: ((p0) {}),
+                            onDoubleTap: () {},
+                            onSwipe: () {},
+                            onTap: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: 150.0,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF555294),
+                              Color(0xFF3E3A6D),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            stops: [0.1, 0.9],
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
+                        child: TextFormField(
+                          maxLines: null,
+                          controller: descriptionController,
+                          decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              labelText: " To Do Description ",
+                              hintText: "Enter your to do description"),
+                        ),
                       ),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      addtasktofirebase();
+                      addTaskToFirebase();
                       Navigator.pushNamed(context, MyRoutes.homeRoute);
                     },
                     style: ButtonStyle(

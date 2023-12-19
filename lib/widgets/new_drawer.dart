@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:doal/pages/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class NewDrawer extends StatelessWidget {
   const NewDrawer({super.key});
@@ -11,7 +10,7 @@ class NewDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color(0xFF555294),
@@ -26,7 +25,7 @@ class NewDrawer extends StatelessWidget {
           child: SingleChildScrollView(
               child: Column(
             children: [
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   CircleAvatar(
@@ -50,27 +49,27 @@ class NewDrawer extends StatelessWidget {
                 endIndent: 10.0,
                 color: Color(0xff29274F),
               ),
-              Text(
+              const Text(
                 "Workspaces",
                 style: TextStyle(
                   fontSize: 20.0,
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               ElevatedButton(
                 style: ButtonStyle(
                   side: MaterialStateProperty.all(
-                      BorderSide(width: 1, color: Colors.white)),
+                      const BorderSide(width: 1, color: Colors.white)),
                   elevation: MaterialStateProperty.all(0.0),
-                  fixedSize: MaterialStateProperty.all(Size(260, 40)),
+                  fixedSize: MaterialStateProperty.all(const Size(260, 40)),
                   backgroundColor:
                       MaterialStateProperty.all(Colors.transparent),
                 ),
                 onPressed: () {},
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.attachment_outlined),
                     SizedBox(
@@ -85,20 +84,20 @@ class NewDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 3.0,
               ),
               ElevatedButton(
                 style: ButtonStyle(
                   side: MaterialStateProperty.all(
-                      BorderSide(width: 1, color: Colors.white)),
+                      const BorderSide(width: 1, color: Colors.white)),
                   elevation: MaterialStateProperty.all(0.0),
-                  fixedSize: MaterialStateProperty.all(Size(260, 40)),
+                  fixedSize: MaterialStateProperty.all(const Size(260, 40)),
                   backgroundColor:
                       MaterialStateProperty.all(Colors.transparent),
                 ),
                 onPressed: () {},
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.attachment_outlined),
                     SizedBox(
@@ -113,20 +112,20 @@ class NewDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 3.0,
               ),
               ElevatedButton(
                 style: ButtonStyle(
                   side: MaterialStateProperty.all(
-                      BorderSide(width: 1, color: Colors.white)),
+                      const BorderSide(width: 1, color: Colors.white)),
                   elevation: MaterialStateProperty.all(0.0),
-                  fixedSize: MaterialStateProperty.all(Size(260, 40)),
+                  fixedSize: MaterialStateProperty.all(const Size(260, 40)),
                   backgroundColor:
                       MaterialStateProperty.all(Colors.transparent),
                 ),
                 onPressed: () {},
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.attachment_outlined),
                     SizedBox(
@@ -141,20 +140,20 @@ class NewDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 3.0,
               ),
               ElevatedButton(
                 style: ButtonStyle(
                   side: MaterialStateProperty.all(
-                      BorderSide(width: 1, color: Colors.white)),
+                      const BorderSide(width: 1, color: Colors.white)),
                   elevation: MaterialStateProperty.all(0.0),
-                  fixedSize: MaterialStateProperty.all(Size(260, 40)),
+                  fixedSize: MaterialStateProperty.all(const Size(260, 40)),
                   backgroundColor:
                       MaterialStateProperty.all(Colors.transparent),
                 ),
                 onPressed: () {},
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.add),
                     SizedBox(
@@ -169,7 +168,7 @@ class NewDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 250.0,
               ),
               const Divider(
@@ -188,12 +187,12 @@ class NewDrawer extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (builder) => SignUpPage(
+                              builder: (builder) => const SignUpPage(
                                     email: '',
                                   )),
                           (route) => false);
                     },
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(
@@ -215,6 +214,5 @@ class NewDrawer extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

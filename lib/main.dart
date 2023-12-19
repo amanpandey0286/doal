@@ -11,7 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,9 +25,9 @@ class MyApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return HomePage();
+            return const HomePage();
           } else {
-            return SignUpPage(
+            return const SignUpPage(
               email: '',
             );
           }
@@ -35,12 +35,12 @@ class MyApp extends StatelessWidget {
       ),
       theme: MyTheme.MyThemeData(),
       routes: {
-        MyRoutes.homeRoute: (context) => HomePage(),
-        MyRoutes.signUpRoute: (context) => SignUpPage(
+        MyRoutes.homeRoute: (context) => const HomePage(),
+        MyRoutes.signUpRoute: (context) => const SignUpPage(
               email: '',
             ),
-        MyRoutes.signInRoute: (context) => SignInPage(),
-        MyRoutes.addtodo :(context) => AddToDoWidget(),
+        MyRoutes.signInRoute: (context) => const SignInPage(),
+        MyRoutes.addtodo :(context) => const AddToDoWidget(),
       },
     );
   }

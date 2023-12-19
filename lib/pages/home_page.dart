@@ -18,25 +18,34 @@ class _HomePageState extends State<HomePage> {
   String uid = '1';
   @override
   void initState() {
-    getuid();
+    getUid();
     super.initState();
   }
 
-  getuid() {
+  Future<void> getUid() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
-    setState(() {
-      uid = user!.uid;
-    });
+
+    if (user != null) {
+      // Wait for the user to be fully authenticated
+      await user.reload();
+      final updatedUser = auth.currentUser;
+
+      if (updatedUser != null) {
+        setState(() {
+          uid = updatedUser.uid;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NewDrawer(),
+      drawer: const NewDrawer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: MyTheme.MyThemeData().primaryColor,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.pushNamed(context, MyRoutes.addtodo);
         },
@@ -49,37 +58,50 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('tasks')
             .doc(uid)
             .collection('mytasks')
             .snapshots(),
-        builder: ((context, snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Container(
-                child: CircularProgressIndicator(),
-              ),
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return const Center(
+              child: Text('Error fetching data'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text('No tasks available'),
             );
           } else {
             final docs = snapshot.data!.docs;
             return ListView.builder(
               itemCount: docs.length,
-              itemBuilder: ((context, index) {
-                var date = (docs[index]['date']);
+              itemBuilder: (context, index) {
+                var task = docs[index].data();
+                var dueDate = task['date']?.toString() ??
+                    ''; // Handle null with default value
+                var dueTime = task['time']?.toString() ??
+                    ''; // Handle null with default value
+                var taskTitle = task['title']?.toString() ??
+                    ''; // Handle null with default value
                 return ToDoWidget(
-                  due_date: docs[index]['date'].toString(),
-                  due_time: docs[index]['time'].toString(),
-                  title: docs[index]['title'],
+                  due_date: dueDate,
+                  due_time: dueTime,
+                  title: taskTitle,
+                  check: false,
                 );
-              }),
+              },
             );
           }
-        }),
+        },
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        items: [
+        items: const [
           Icon(Icons.calendar_view_day),
           Icon(Icons.all_inbox),
           Icon(Icons.home),

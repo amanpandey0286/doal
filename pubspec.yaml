@@ -45,6 +45,7 @@ dependencies:
   intl: ^0.18.1
   google_sign_in: ^6.1.4
   provider: ^6.1.1
+  lite_rolling_switch: ^1.0.1
 
 dev_dependencies:
   flutter_test:
