@@ -1,11 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:doal/pages/view_edit_todo.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
 import 'package:doal/widgets/new_drawer.dart';
 import 'package:doal/widgets/to_do_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+class Select {
+  String id;
+  bool checkValue = false;
+  Select({required this.id, required this.checkValue});
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,6 +47,13 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List<Select> selected = [];
+  void onChange(int index) {
+    setState(() {
+      selected[index].checkValue = !selected[index].checkValue;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,14 +68,17 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text(
           "Today's To Do",
-          style: TextStyle(fontSize: 30.0, fontStyle: FontStyle.italic),
+          style: TextStyle(
+              fontSize: 30.0,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
-            .collection('tasks')
+            .collection('Todo')
             .doc(uid)
             .collection('mytasks')
             .snapshots(),
@@ -83,17 +101,38 @@ class _HomePageState extends State<HomePage> {
               itemCount: docs.length,
               itemBuilder: (context, index) {
                 var task = docs[index].data();
+                var taskId = docs[index].id; // Fetch the document ID as taskId
                 var dueDate = task['date']?.toString() ??
                     ''; // Handle null with default value
                 var dueTime = task['time']?.toString() ??
                     ''; // Handle null with default value
                 var taskTitle = task['title']?.toString() ??
                     ''; // Handle null with default value
-                return ToDoWidget(
-                  due_date: dueDate,
-                  due_time: dueTime,
-                  title: taskTitle,
-                  check: false,
+
+                selected.add(Select(id: taskId, checkValue: false));
+                return InkWell(
+                  onTap: () {
+                    if (taskId.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewToDoWidget(taskId: taskId),
+                        ),
+                      );
+                    } else {
+                      // Handle the case when taskId is empty
+                      // For example, show an error message or log an error
+                      Fluttertoast.showToast(msg: 'Can,t show');
+                    }
+                  },
+                  child: ToDoWidget(
+                    due_date: dueDate,
+                    due_time: dueTime,
+                    title: taskTitle,
+                    check: selected[index].checkValue,
+                    index: index,
+                    onChange: onChange,
+                  ),
                 );
               },
             );

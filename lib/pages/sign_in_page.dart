@@ -16,7 +16,6 @@ class _SignInPageState extends State<SignInPage> {
   firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
   bool circular = false;
 
   GoogleAuthClass googleAuthClass = GoogleAuthClass();

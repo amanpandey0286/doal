@@ -1,45 +1,123 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doal/utils/routes.dart';
+import 'package:doal/utils/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 
-class AddToDoWidget extends StatefulWidget {
-  const AddToDoWidget({super.key});
+class ViewToDoWidget extends StatefulWidget {
+  final String taskId;
+
+  const ViewToDoWidget({Key? key, required this.taskId}) : super(key: key);
 
   @override
-  State<AddToDoWidget> createState() => _AddToDoWidgetState();
+  State<ViewToDoWidget> createState() => _ViewToDoWidgetState();
 }
 
-class _AddToDoWidgetState extends State<AddToDoWidget> {
+class _ViewToDoWidgetState extends State<ViewToDoWidget> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
+  late TextEditingController descriptionController = TextEditingController();
   bool impCheck = false;
   bool remCheck = false;
+  late int date;
+  late String time;
+  bool edit = false;
 
-  Future<void> addTaskToFirebase() async {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
 
     if (user != null) {
       String uid = user.uid;
-      // String taskId = generateTaskId();
 
-      await FirebaseFirestore.instance
+      // Fetch the task document using the passed taskId
+      DocumentSnapshot taskSnapshot = await FirebaseFirestore.instance
           .collection('Todo')
           .doc(uid)
           .collection('mytasks')
-          .add({
-        'title': titleController.text,
-        'description': descriptionController.text,
-        'time': _timeOfDay.format(context),
-        'date': _dateTime.microsecondsSinceEpoch,
-        'impCheck': impCheck,
-        'remCheck': remCheck,
-      });
+          .doc(widget.taskId) // Use the passed task ID
+          .get();
 
-      Fluttertoast.showToast(msg: 'Data Added');
+      if (taskSnapshot.exists) {
+        // Populate the controllers and variables with fetched data
+        var data = taskSnapshot.data() as Map<String, dynamic>;
+        setState(() {
+          titleController = TextEditingController(text: data['title']);
+          descriptionController =
+              TextEditingController(text: data['description']);
+          impCheck = data['impCheck'] ?? false;
+          remCheck = data['remCheck'] ?? false;
+          date = data['date'] ?? 0;
+          time = data['time'] ?? '';
+        });
+      }
+    }
+  }
+
+  Future<void> updateData() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user != null) {
+      String uid = user.uid;
+
+      // Fetch the task document using the passed taskId
+      DocumentReference documentReference = FirebaseFirestore.instance
+          .collection('Todo')
+          .doc(uid)
+          .collection('mytasks')
+          .doc(widget.taskId); // Use the passed task ID
+
+      DocumentSnapshot taskSnapshot = await documentReference.get();
+
+      if (taskSnapshot.exists) {
+        // Populate the controllers and variables with fetched data
+        var data = taskSnapshot.data() as Map<String, dynamic>;
+
+        // Update the fields with new data (assumed from edited values)
+        data['title'] = titleController.text;
+        data['description'] = descriptionController.text;
+        data['impCheck'] = impCheck;
+        data['remCheck'] = remCheck;
+        data['date'] = date;
+        data['time'] = time;
+
+        // Update the document with the modified data
+        await documentReference.update(data);
+        Fluttertoast.showToast(msg: 'Task Updated');
+      }
+    }
+  }
+
+  Future<void> deleteTask() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user != null) {
+      String uid = user.uid;
+
+      // Reference the task document using the passed taskId
+      DocumentReference documentReference = FirebaseFirestore.instance
+          .collection('Todo')
+          .doc(uid)
+          .collection('mytasks')
+          .doc(widget.taskId); // Use the passed task ID
+
+      DocumentSnapshot taskSnapshot = await documentReference.get();
+
+      if (taskSnapshot.exists) {
+        // Delete the document from Firestore
+        await documentReference.delete();
+        Fluttertoast.showToast(msg: 'Task Deleted');
+      }
     }
   }
 
@@ -73,6 +151,58 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "btn1",
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Column(
+                children: [
+                  Icon(
+                    edit ? Icons.check : Icons.edit,
+                    color: edit ? Colors.green : Colors.white,
+                  ),
+                  Text(
+                    edit ? "Save" : "Edit",
+                    style: const TextStyle(fontSize: 12),
+                  )
+                ],
+              ),
+            ),
+            onPressed: () {
+              setState(() {
+                edit = !edit;
+                if (!edit) {
+                  updateData();
+                }
+              });
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+              heroTag: "btn2",
+              child: const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: Column(
+                  children: [
+                    Icon(Icons.delete),
+                    Text(
+                      "Delete",
+                      style: TextStyle(fontSize: 12),
+                    )
+                  ],
+                ),
+              ),
+              onPressed: () {
+                deleteTask();
+                Navigator.pushNamed(context, MyRoutes.homeRoute);
+              })
+        ],
+      ),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
@@ -97,9 +227,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(children: [
-                  const Text(
-                    "New Task",
-                    style: TextStyle(
+                  Text(
+                    edit ? "Editing Task" : "Viewing Task",
+                    style: const TextStyle(
                         fontSize: 30.0,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w800),
@@ -111,6 +241,7 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: titleController,
+                      enabled: edit,
                       decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50.0),
@@ -121,9 +252,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                           ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50.0)),
-                          labelText: " Todo title ",
+                          labelText: " title ",
                           prefixIcon: const Icon(Icons.add_task_outlined),
-                          hintText: "Enter your to do title"),
+                          hintText: " your to do title"),
                     ),
                   ),
                   Padding(
@@ -258,28 +389,13 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                         child: TextFormField(
                           maxLines: null,
                           controller: descriptionController,
-                          decoration: const InputDecoration(
+                          enabled: edit,
+                          decoration: InputDecoration(
                               border: InputBorder.none,
                               labelText: " To Do Description ",
-                              hintText: "Enter your to do description"),
+                              hintText: " your to do description"),
                         ),
                       ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      addTaskToFirebase();
-                      Navigator.pop(context);
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(const StadiumBorder()),
-                      fixedSize: MaterialStateProperty.all(
-                        const Size(120, 40),
-                      ),
-                    ),
-                    child: const Text(
-                      "Add",
-                      style: TextStyle(fontSize: 20.0),
                     ),
                   ),
                 ]),

@@ -2,6 +2,7 @@ import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_in_page.dart';
 import 'package:doal/pages/sign_up_page.dart';
 import 'package:doal/pages/to_do_add_page.dart';
+import 'package:doal/pages/view_edit_todo.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,8 @@ class MyApp extends StatelessWidget {
               email: '',
             ),
         MyRoutes.signInRoute: (context) => const SignInPage(),
-        MyRoutes.addtodo :(context) => const AddToDoWidget(),
+        MyRoutes.addtodo: (context) => const AddToDoWidget(),
+        MyRoutes.viewtodo: (context) => const ViewToDoWidget(taskId: '',),
       },
     );
   }
