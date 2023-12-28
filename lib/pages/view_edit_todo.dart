@@ -18,16 +18,19 @@ class ViewToDoWidget extends StatefulWidget {
 class _ViewToDoWidgetState extends State<ViewToDoWidget> {
   TextEditingController titleController = TextEditingController();
   late TextEditingController descriptionController = TextEditingController();
-  bool impCheck = false;
-  bool remCheck = false;
-  late int date;
-  late String time;
+
+  late bool _impCheck;
+  late bool _remCheck;
+  late TextEditingController _dateC;
+  late TextEditingController _timeC;
   bool edit = false;
+  bool _dataFetched = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _dateC = TextEditingController(); // Initialize _dateC
+    _timeC = TextEditingController(); // Initialize _timeC
     fetchData();
   }
 
@@ -53,10 +56,11 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
           titleController = TextEditingController(text: data['title']);
           descriptionController =
               TextEditingController(text: data['description']);
-          impCheck = data['impCheck'] ?? false;
-          remCheck = data['remCheck'] ?? false;
-          date = data['date'] ?? 0;
-          time = data['time'] ?? '';
+          _dateC.text = data['date'] ?? '';
+          _timeC.text = data['time'] ?? '';
+          _impCheck = data['impCheck'] ?? false;
+          _remCheck = data['remCheck'] ?? false;
+          _dataFetched = true;
         });
       }
     }
@@ -85,10 +89,11 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
         // Update the fields with new data (assumed from edited values)
         data['title'] = titleController.text;
         data['description'] = descriptionController.text;
-        data['impCheck'] = impCheck;
-        data['remCheck'] = remCheck;
-        data['date'] = date;
-        data['time'] = time;
+        data['impCheck'] = _impCheck;
+        data['remCheck'] = _remCheck;
+        data['date'] = _dateC.text;
+        data['time'] = _timeC.text;
+        data['check'] = false;
 
         // Update the document with the modified data
         await documentReference.update(data);
@@ -121,31 +126,37 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
     }
   }
 
-  DateTime _dateTime = DateTime.now();
-  TimeOfDay _timeOfDay = const TimeOfDay(hour: 8, minute: 30);
+  ///Date
+  DateTime selected = DateTime.now();
+  DateTime initial = DateTime(2000);
+  DateTime last = DateTime(2025);
 
-  void _showDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2010),
-            lastDate: DateTime(2040))
-        .then((value) {
+  ///Time
+  TimeOfDay timeOfDay = TimeOfDay.now();
+
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
+      context: context,
+      initialDate: selected,
+      firstDate: initial,
+      lastDate: last,
+    );
+
+    if (date != null) {
       setState(() {
-        _dateTime = value!;
+        _dateC.text = date.toLocal().toString().split(" ")[0];
       });
-    });
+    }
   }
 
-  void _showTimePicker() {
-    showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    ).then((value) {
+  Future displayTimePicker(BuildContext context) async {
+    var time = await showTimePicker(context: context, initialTime: timeOfDay);
+
+    if (time != null) {
       setState(() {
-        _timeOfDay = value!;
+        _timeC.text = "${time.hour}:${time.minute}";
       });
-    });
+    }
   }
 
   @override
@@ -270,9 +281,10 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
                         TextButton(
-                          onPressed: _showDatePicker,
+                          onPressed:
+                              edit ? () => displayDatePicker(context) : null,
                           child: Text(
-                            _dateTime.day.toString(),
+                            _dateC.text,
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 18.0),
                           ),
@@ -294,11 +306,12 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
                         TextButton(
-                            onPressed: _showTimePicker,
+                            onPressed:
+                                edit ? () => displayTimePicker(context) : null,
                             child: Text(
-                              _timeOfDay.format(context).toString(),
+                              _timeC.text,
                               style: const TextStyle(
-                                  color: Colors.white70, fontSize: 18.0),
+                                  color: Colors.white, fontSize: 18.0),
                             ))
                       ],
                     ),
@@ -317,19 +330,39 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                         Expanded(child: Container()),
                         Transform.scale(
                           scale: 0.6,
-                          child: LiteRollingSwitch(
-                            value: false,
-                            textOn: 'enabled',
-                            textOff: 'disabled',
-                            colorOn: Colors.greenAccent,
-                            colorOff: Colors.redAccent,
-                            iconOn: Icons.done,
-                            iconOff: Icons.close,
-                            textSize: 16.0,
-                            onChanged: ((p0) {}),
-                            onDoubleTap: () {},
-                            onSwipe: () {},
-                            onTap: () {},
+                          child: IgnorePointer(
+                            ignoring: !edit,
+                            child: !_dataFetched
+                                ? CircularProgressIndicator()
+                                : LiteRollingSwitch(
+                                    value: _impCheck,
+                                    textOn: 'enabled',
+                                    textOff: 'disabled',
+                                    colorOn: Colors.greenAccent,
+                                    colorOff: Colors.redAccent,
+                                    iconOn: Icons.done,
+                                    iconOff: Icons.close,
+                                    textSize: 16.0,
+                                    onChanged: edit
+                                        ? (newValue) {
+                                            setState(() {
+                                              _impCheck = newValue;
+                                            });
+                                          }
+                                        : (bool
+                                            newValue) {}, // Empty function when 'edit' is false
+                                    onDoubleTap: () {},
+                                    onSwipe: () {},
+                                    onTap: edit
+                                        ? () {
+                                            setState(() {
+                                              _impCheck = !_impCheck;
+                                              print(
+                                                  'impCheckerValue: $_impCheck');
+                                            });
+                                          }
+                                        : () {}, // Empty function when 'edit' is false
+                                  ),
                           ),
                         ),
                       ],
@@ -343,25 +376,43 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                         const SizedBox(
                           width: 10.0,
                         ),
-                        const Text("Important",
+                        const Text("Remainder",
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
                         Transform.scale(
                           scale: 0.6,
-                          child: LiteRollingSwitch(
-                            value: false,
-                            textOn: 'enabled',
-                            textOff: 'disabled',
-                            colorOn: Colors.greenAccent,
-                            colorOff: Colors.redAccent,
-                            iconOn: Icons.done,
-                            iconOff: Icons.close,
-                            textSize: 16.0,
-                            onChanged: ((p0) {}),
-                            onDoubleTap: () {},
-                            onSwipe: () {},
-                            onTap: () {},
+                          child: IgnorePointer(
+                            ignoring: !edit,
+                            child: !_dataFetched
+                                ? CircularProgressIndicator()
+                                : LiteRollingSwitch(
+                                    value: _remCheck,
+                                    textOn: 'enabled',
+                                    textOff: 'disabled',
+                                    colorOn: Colors.greenAccent,
+                                    colorOff: Colors.redAccent,
+                                    iconOn: Icons.done,
+                                    iconOff: Icons.close,
+                                    textSize: 16.0,
+                                    onChanged: edit
+                                        ? (newValue) {
+                                            setState(() {
+                                              _remCheck = newValue;
+                                            });
+                                          }
+                                        : (bool
+                                            newValue) {}, // Empty function when 'edit' is false
+                                    onDoubleTap: () {},
+                                    onSwipe: () {},
+                                    onTap: edit
+                                        ? () {
+                                            setState(() {
+                                              _remCheck = !_remCheck;
+                                            });
+                                          }
+                                        : () {}, // Empty function when 'edit' is false
+                                  ),
                           ),
                         ),
                       ],

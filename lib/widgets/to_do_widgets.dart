@@ -16,7 +16,7 @@ class ToDoWidget extends StatelessWidget {
   var workspace = '';
   final bool check;
   final Function onChange;
-  final int index;
+  final String index;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +107,7 @@ class ToDoWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    due_time,
+                    due_date,
                     style: const TextStyle(
                       fontSize: 20.0,
                     ),

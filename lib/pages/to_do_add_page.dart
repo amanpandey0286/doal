@@ -3,6 +3,7 @@ import 'package:doal/utils/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 
 class AddToDoWidget extends StatefulWidget {
@@ -17,6 +18,8 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
   TextEditingController descriptionController = TextEditingController();
   bool impCheck = false;
   bool remCheck = false;
+  final _dateC = TextEditingController();
+  final _timeC = TextEditingController();
 
   Future<void> addTaskToFirebase() async {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -33,41 +36,60 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
           .add({
         'title': titleController.text,
         'description': descriptionController.text,
-        'time': _timeOfDay.format(context),
-        'date': _dateTime.microsecondsSinceEpoch,
+        'time': _timeC.text,
+        'date': _dateC.text,
         'impCheck': impCheck,
         'remCheck': remCheck,
+        'check': false,
       });
 
       Fluttertoast.showToast(msg: 'Data Added');
     }
   }
 
-  DateTime _dateTime = DateTime.now();
-  TimeOfDay _timeOfDay = const TimeOfDay(hour: 8, minute: 30);
+  @override
+  void initState() {
+    super.initState();
 
-  void _showDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2010),
-            lastDate: DateTime(2040))
-        .then((value) {
-      setState(() {
-        _dateTime = value!;
-      });
-    });
+    // Initialize _dateC with the current date
+    _dateC.text = DateTime.now().toLocal().toString().split(" ")[0];
+
+    // Initialize _timeC with the current time
+    final currentTime = TimeOfDay.now();
+    _timeC.text = '${currentTime.hour}:${currentTime.minute}';
   }
 
-  void _showTimePicker() {
-    showTimePicker(
+  ///Date
+  DateTime selected = DateTime.now();
+  DateTime initial = DateTime(2000);
+  DateTime last = DateTime(2025);
+
+  ///Time
+  TimeOfDay timeOfDay = TimeOfDay.now();
+
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
-    ).then((value) {
+      initialDate: selected,
+      firstDate: initial,
+      lastDate: last,
+    );
+
+    if (date != null) {
       setState(() {
-        _timeOfDay = value!;
+        _dateC.text = date.toLocal().toString().split(" ")[0];
       });
-    });
+    }
+  }
+
+  Future displayTimePicker(BuildContext context) async {
+    var time = await showTimePicker(context: context, initialTime: timeOfDay);
+
+    if (time != null) {
+      setState(() {
+        _timeC.text = "${time.hour}:${time.minute}";
+      });
+    }
   }
 
   @override
@@ -139,9 +161,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
                         TextButton(
-                          onPressed: _showDatePicker,
+                          onPressed: () => displayDatePicker(context),
                           child: Text(
-                            _dateTime.day.toString(),
+                            _dateC.text,
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 18.0),
                           ),
@@ -163,11 +185,11 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
                         TextButton(
-                            onPressed: _showTimePicker,
+                            onPressed: () => displayTimePicker(context),
                             child: Text(
-                              _timeOfDay.format(context).toString(),
+                              _timeC.text,
                               style: const TextStyle(
-                                  color: Colors.white70, fontSize: 18.0),
+                                  color: Colors.white, fontSize: 18.0),
                             ))
                       ],
                     ),
@@ -198,7 +220,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                             onChanged: ((p0) {}),
                             onDoubleTap: () {},
                             onSwipe: () {},
-                            onTap: () {},
+                            onTap: () {
+                              impCheck = !impCheck;
+                            },
                           ),
                         ),
                       ],
@@ -212,7 +236,7 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                         const SizedBox(
                           width: 10.0,
                         ),
-                        const Text("Important",
+                        const Text("Remainder",
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.bold)),
                         Expanded(child: Container()),
@@ -230,7 +254,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                             onChanged: ((p0) {}),
                             onDoubleTap: () {},
                             onSwipe: () {},
-                            onTap: () {},
+                            onTap: () {
+                              remCheck = !remCheck;
+                            },
                           ),
                         ),
                       ],

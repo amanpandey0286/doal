@@ -9,11 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class Select {
-  String id;
-  bool checkValue = false;
-  Select({required this.id, required this.checkValue});
-}
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String uid = '1';
+  bool checkvalue = false;
   @override
   void initState() {
     getUid();
@@ -45,13 +42,6 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
-  }
-
-  List<Select> selected = [];
-  void onChange(int index) {
-    setState(() {
-      selected[index].checkValue = !selected[index].checkValue;
-    });
   }
 
   @override
@@ -108,8 +98,9 @@ class _HomePageState extends State<HomePage> {
                     ''; // Handle null with default value
                 var taskTitle = task['title']?.toString() ??
                     ''; // Handle null with default value
+                bool doneCheck = task['check'];
 
-                selected.add(Select(id: taskId, checkValue: false));
+              
                 return InkWell(
                   onTap: () {
                     if (taskId.isNotEmpty) {
@@ -129,8 +120,8 @@ class _HomePageState extends State<HomePage> {
                     due_date: dueDate,
                     due_time: dueTime,
                     title: taskTitle,
-                    check: selected[index].checkValue,
-                    index: index,
+                    check: doneCheck,
+                    index: taskId,
                     onChange: onChange,
                   ),
                 );
@@ -150,5 +141,32 @@ class _HomePageState extends State<HomePage> {
         color: MyTheme.MyThemeData().primaryColor,
       ),
     );
+  }
+
+  //to update checkvalue
+  Future<void> updateCheckValue(String taskId, bool newValue) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user != null) {
+      String uid = user.uid;
+
+      // Reference to the specific task document using the taskId obtained from the StreamBuilder
+      DocumentReference documentReference = FirebaseFirestore.instance
+          .collection('Todo')
+          .doc(uid)
+          .collection('mytasks')
+          .doc(taskId); 
+
+      // Update the 'check' field with the new value
+      await documentReference.update({'check': newValue});
+    }
+  }
+
+  void onChange(String taskId) {
+    setState(() {
+      checkvalue = !checkvalue;
+      updateCheckValue(taskId, checkvalue);
+    });
   }
 }
