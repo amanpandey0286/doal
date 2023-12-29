@@ -137,14 +137,13 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50.0),
                             borderSide: const BorderSide(
-                              color: Colors.white30,
+                              color: Colors.white60,
                               width: 2.0,
                             ),
                           ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50.0)),
                           labelText: " Todo title ",
-                          prefixIcon: const Icon(Icons.add_task_outlined),
                           hintText: "Enter your to do title"),
                     ),
                   ),
@@ -232,7 +231,7 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
                     child: Row(
                       children: [
-                        Icon(Icons.star_border_purple500_sharp),
+                        const Icon(Icons.alarm_on_outlined),
                         const SizedBox(
                           width: 10.0,
                         ),

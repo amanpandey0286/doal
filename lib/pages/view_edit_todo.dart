@@ -253,19 +253,26 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                     child: TextFormField(
                       controller: titleController,
                       enabled: edit,
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w600),
                       decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                            borderSide: const BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
-                            ),
+                        // Set consistent border for both enabled and disabled states
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
                           ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0)),
-                          labelText: " title ",
-                          prefixIcon: const Icon(Icons.add_task_outlined),
-                          hintText: " your to do title"),
+                        ),
+                        labelText: " title ",
+                        hintText: " your to do title",
+                        labelStyle: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   Padding(
@@ -320,7 +327,7 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                     padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
                     child: Row(
                       children: [
-                        Icon(Icons.star_border_purple500_sharp),
+                        const Icon(Icons.star_border_purple500_sharp),
                         const SizedBox(
                           width: 10.0,
                         ),
@@ -343,22 +350,20 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                                     iconOn: Icons.done,
                                     iconOff: Icons.close,
                                     textSize: 16.0,
-                                    onChanged: edit
-                                        ? (newValue) {
+                                    onChanged:
+                                        ((p0) {}), // Empty function when 'edit' is false
+                                    onDoubleTap: () {},
+                                    onSwipe: edit
+                                        ? () {
                                             setState(() {
-                                              _impCheck = newValue;
+                                              _impCheck = !_impCheck;
                                             });
                                           }
-                                        : (bool
-                                            newValue) {}, // Empty function when 'edit' is false
-                                    onDoubleTap: () {},
-                                    onSwipe: () {},
+                                        : () {},
                                     onTap: edit
                                         ? () {
                                             setState(() {
                                               _impCheck = !_impCheck;
-                                              print(
-                                                  'impCheckerValue: $_impCheck');
                                             });
                                           }
                                         : () {}, // Empty function when 'edit' is false
@@ -372,7 +377,7 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
                     child: Row(
                       children: [
-                        Icon(Icons.star_border_purple500_sharp),
+                        const Icon(Icons.alarm_on_outlined),
                         const SizedBox(
                           width: 10.0,
                         ),
@@ -395,16 +400,16 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                                     iconOn: Icons.done,
                                     iconOff: Icons.close,
                                     textSize: 16.0,
-                                    onChanged: edit
-                                        ? (newValue) {
+                                    onChanged:
+                                        ((p0) {}), // Empty function when 'edit' is false
+                                    onDoubleTap: () {},
+                                    onSwipe: edit
+                                        ? () {
                                             setState(() {
-                                              _remCheck = newValue;
+                                              _remCheck = !_remCheck;
                                             });
                                           }
-                                        : (bool
-                                            newValue) {}, // Empty function when 'edit' is false
-                                    onDoubleTap: () {},
-                                    onSwipe: () {},
+                                        : () {},
                                     onTap: edit
                                         ? () {
                                             setState(() {
@@ -441,7 +446,10 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                           maxLines: null,
                           controller: descriptionController,
                           enabled: edit,
-                          decoration: InputDecoration(
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          decoration: const InputDecoration(
                               border: InputBorder.none,
                               labelText: " To Do Description ",
                               hintText: " your to do description"),

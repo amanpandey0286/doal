@@ -77,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50.0),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.white30,
                             width: 2.0,
                           ),
@@ -104,7 +104,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50.0),
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.white30,
                               width: 2.0,
                             ),
