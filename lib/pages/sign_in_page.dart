@@ -17,6 +17,7 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   bool circular = false;
+  bool _isObscure = true;
 
   GoogleAuthClass googleAuthClass = GoogleAuthClass();
 
@@ -24,11 +25,11 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const common_widget(),
-              Container(
+        child: Column(
+          children: [
+            const CommonWidget(),
+            Expanded(
+              child: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -45,51 +46,52 @@ class _SignInPageState extends State<SignInPage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 30.0, vertical: 30.0),
-                  child: Form(
-                    child: Column(
-                      children: [
-                        InkWell(
-                            onTap: () async {
-                              await googleAuthClass.googleSignIn(
-                                  context, _emailController.toString());
-                            },
-                            child: const GoogleButton()),
-                        const Text(
-                          "OR",
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0),
-                                borderSide: BorderSide(
-                                  color: Colors.white30,
-                                  width: 2.0,
+                  child: SingleChildScrollView(
+                    child: Form(
+                      child: Column(
+                        children: [
+                          InkWell(
+                              onTap: () async {
+                                await googleAuthClass.googleSignIn(
+                                    context, _emailController.toString());
+                              },
+                              child: const GoogleButton()),
+                          const Text(
+                            "OR",
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  borderSide: BorderSide(
+                                    color: Colors.white30,
+                                    width: 2.0,
+                                  ),
                                 ),
-                              ),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50.0)),
-                              labelText: "Email",
-                              hintText: "Enter your Email"),
-                          keyboardType: TextInputType.emailAddress,
-                          key: const ValueKey('email'),
-                          validator: (value) {
-                            if (value!.isEmpty || !value.contains('@')) {
-                              return 'Incorrect Email';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                        TextFormField(
-                          controller: _pwdController,
-                          decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50.0)),
+                                labelText: "Email",
+                                hintText: "Enter your Email"),
+                            keyboardType: TextInputType.emailAddress,
+                            key: const ValueKey('email'),
+                            validator: (value) {
+                              if (value!.isEmpty || !value.contains('@')) {
+                                return 'Incorrect Email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                          TextFormField(
+                            controller: _pwdController,
+                            decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50.0),
                                 borderSide: BorderSide(
@@ -100,111 +102,122 @@ class _SignInPageState extends State<SignInPage> {
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50.0)),
                               labelText: "Password",
-                              hintText: "Enter your Password"),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Incorrect Password';
-                            }
-                            return null;
-                          },
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const SizedBox(
-                              width: 100.0,
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                "Forgot Password?",
-                                style: TextStyle(
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors
-                                          .black54, // Choose the color of the shadow
-                                      blurRadius:
-                                          2.0, // Adjust the blur radius for the shadow effect
-                                      offset: Offset(2.0,
-                                          2.0), // Set the horizontal and vertical offset for the shadow
-                                    ),
-                                  ],
+                              hintText: "Enter your Password",
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isObscure
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                 ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscure = !_isObscure;
+                                  });
+                                },
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, MyRoutes.signUpRoute);
-                          },
-                          child: const Text(
-                            "Back to Sign up >",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              shadows: [
-                                Shadow(
-                                  color: Colors
-                                      .black54, // Choose the color of the shadow
-                                  blurRadius:
-                                      2.0, // Adjust the blur radius for the shadow effect
-                                  offset: Offset(2.0,
-                                      2.0), // Set the horizontal and vertical offset for the shadow
+                            obscureText: _isObscure,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Incorrect Password';
+                              }
+                              return null;
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(child: SizedBox()),
+                              TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors
+                                            .black54, // Choose the color of the shadow
+                                        blurRadius:
+                                            2.0, // Adjust the blur radius for the shadow effect
+                                        offset: Offset(2.0,
+                                            2.0), // Set the horizontal and vertical offset for the shadow
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              "Back to Sign up >",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors
+                                        .black54, // Choose the color of the shadow
+                                    blurRadius:
+                                        2.0, // Adjust the blur radius for the shadow effect
+                                    offset: Offset(2.0,
+                                        2.0), // Set the horizontal and vertical offset for the shadow
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              firebase_auth.UserCredential userCredential =
-                                  await firebaseAuth.signInWithEmailAndPassword(
-                                      email: _emailController.text,
-                                      password: _pwdController.text);
-                              print(userCredential.user!.email);
-                              setState(() {
-                                circular = false;
-                              });
-                              Navigator.pushNamed(context, MyRoutes.homeRoute);
-                            } catch (e) {
-                              final snackbar =
-                                  SnackBar(content: Text(e.toString()));
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackbar);
-                              setState(() {
-                                circular = false;
-                              });
-                            }
-                          },
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                const StadiumBorder()),
-                            fixedSize: MaterialStateProperty.all(
-                              const Size(120, 50),
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                firebase_auth.UserCredential userCredential =
+                                    await firebaseAuth
+                                        .signInWithEmailAndPassword(
+                                            email: _emailController.text,
+                                            password: _pwdController.text);
+                                print(userCredential.user!.email);
+                                setState(() {
+                                  circular = false;
+                                });
+                                Navigator.pushNamed(
+                                    context, MyRoutes.homeRoute);
+                              } catch (e) {
+                                final snackbar =
+                                    SnackBar(content: Text(e.toString()));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackbar);
+                                setState(() {
+                                  circular = false;
+                                });
+                              }
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  const StadiumBorder()),
+                              fixedSize: MaterialStateProperty.all(
+                                const Size(120, 50),
+                              ),
                             ),
+                            child: circular
+                                ? const CircularProgressIndicator()
+                                : const Text(
+                                    "Sign In",
+                                    style: TextStyle(fontSize: 20.0),
+                                  ),
                           ),
-                          child: circular
-                              ? const CircularProgressIndicator()
-                              : const Text(
-                                  "Sign In",
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                        ),
-                        const SizedBox(
-                          height: 10.0,
-                        )
-                      ],
+                          const SizedBox(
+                            height: 10.0,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

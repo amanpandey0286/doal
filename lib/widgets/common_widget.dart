@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
-class common_widget extends StatelessWidget {
-  const common_widget({
+class CommonWidget extends StatelessWidget {
+  const CommonWidget({
     Key? key,
   }) : super(key: key);
 
@@ -10,7 +11,7 @@ class common_widget extends StatelessWidget {
     return Column(
       children: [
         const Padding(
-          padding: EdgeInsets.symmetric(vertical: 35.0),
+          padding: EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             "Doal",
             style: TextStyle(
@@ -23,7 +24,7 @@ class common_widget extends StatelessWidget {
         ),
         SizedBox(
           height: 250.0,
-          child: Image.asset("assets/images/login_anim.gif"),
+          child: Lottie.asset('assets/images/login.json'),
         ),
       ],
     );

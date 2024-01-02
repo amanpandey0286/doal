@@ -1,4 +1,6 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doal/utils/myalarm.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,7 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
       String uid = user.uid;
       // String taskId = generateTaskId();
 
-      await FirebaseFirestore.instance
+      var docRef = await FirebaseFirestore.instance
           .collection('Todo')
           .doc(uid)
           .collection('mytasks')
@@ -43,7 +45,17 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
         'check': false,
       });
 
+      var taskId = docRef.id;
+
       Fluttertoast.showToast(msg: 'Data Added');
+      if (remCheck) {
+        await AlarmManager.setAlarm(
+          taskId,
+          _dateC.text,
+          _timeC.text,
+          titleController.text,
+        );
+      }
     }
   }
 
@@ -96,13 +108,13 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 250,
-            ),
-            Container(
+          child: Column(
+        children: [
+          Container(
+            height: 250,
+          ),
+          Expanded(
+            child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -118,200 +130,203 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(children: [
-                  const Text(
-                    "New Task",
-                    style: TextStyle(
-                        fontSize: 30.0,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                            borderSide: const BorderSide(
-                              color: Colors.white60,
-                              width: 2.0,
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    const Text(
+                      "New Task",
+                      style: TextStyle(
+                          fontSize: 30.0,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: titleController,
+                        decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              borderSide: const BorderSide(
+                                color: Colors.white60,
+                                width: 2.0,
+                              ),
                             ),
-                          ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0)),
-                          labelText: " Todo title ",
-                          hintText: "Enter your to do title"),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0)),
+                            labelText: " Todo title ",
+                            hintText: "Enter your to do title"),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.date_range_rounded),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Set Date",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        TextButton(
-                          onPressed: () => displayDatePicker(context),
-                          child: Text(
-                            _dateC.text,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 18.0),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.date_range_rounded),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Icon(Icons.timer_sharp),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Set Time",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        TextButton(
-                            onPressed: () => displayTimePicker(context),
+                          const Text("Set Date",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          TextButton(
+                            onPressed: () => displayDatePicker(context),
                             child: Text(
-                              _timeC.text,
+                              _dateC.text,
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 18.0),
-                            ))
-                      ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
-                    child: Row(
-                      children: [
-                        Icon(Icons.star_border_purple500_sharp),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Important",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        Transform.scale(
-                          scale: 0.6,
-                          child: LiteRollingSwitch(
-                            value: false,
-                            textOn: 'enabled',
-                            textOff: 'disabled',
-                            colorOn: Colors.greenAccent,
-                            colorOff: Colors.redAccent,
-                            iconOn: Icons.done,
-                            iconOff: Icons.close,
-                            textSize: 16.0,
-                            onChanged: ((p0) {}),
-                            onDoubleTap: () {},
-                            onSwipe: () {},
-                            onTap: () {
-                              impCheck = !impCheck;
-                            },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Icon(Icons.timer_sharp),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        ),
-                      ],
+                          const Text("Set Time",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          TextButton(
+                              onPressed: () => displayTimePicker(context),
+                              child: Text(
+                                _timeC.text,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 18.0),
+                              ))
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.alarm_on_outlined),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Remainder",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        Transform.scale(
-                          scale: 0.6,
-                          child: LiteRollingSwitch(
-                            value: false,
-                            textOn: 'enabled',
-                            textOff: 'disabled',
-                            colorOn: Colors.greenAccent,
-                            colorOff: Colors.redAccent,
-                            iconOn: Icons.done,
-                            iconOff: Icons.close,
-                            textSize: 16.0,
-                            onChanged: ((p0) {}),
-                            onDoubleTap: () {},
-                            onSwipe: () {},
-                            onTap: () {
-                              remCheck = !remCheck;
-                            },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          Icon(Icons.star_border_purple500_sharp),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        ),
-                      ],
+                          const Text("Important",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          Transform.scale(
+                            scale: 0.6,
+                            child: LiteRollingSwitch(
+                              value: false,
+                              textOn: 'enabled',
+                              textOff: 'disabled',
+                              colorOn: Colors.greenAccent,
+                              colorOff: Colors.redAccent,
+                              iconOn: Icons.done,
+                              iconOff: Icons.close,
+                              textSize: 16.0,
+                              onChanged: ((p0) {}),
+                              onDoubleTap: () {},
+                              onSwipe: () {},
+                              onTap: () {
+                                impCheck = !impCheck;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 150.0,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF555294),
-                              Color(0xFF3E3A6D),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            stops: [0.1, 0.9],
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.alarm_on_outlined),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        child: TextFormField(
-                          maxLines: null,
-                          controller: descriptionController,
-                          decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              labelText: " To Do Description ",
-                              hintText: "Enter your to do description"),
+                          const Text("Remainder",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          Transform.scale(
+                            scale: 0.6,
+                            child: LiteRollingSwitch(
+                              value: false,
+                              textOn: 'enabled',
+                              textOff: 'disabled',
+                              colorOn: Colors.greenAccent,
+                              colorOff: Colors.redAccent,
+                              iconOn: Icons.done,
+                              iconOff: Icons.close,
+                              textSize: 16.0,
+                              onChanged: ((p0) {}),
+                              onDoubleTap: () {},
+                              onSwipe: () {},
+                              onTap: () {
+                                remCheck = !remCheck;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 150.0,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF555294),
+                                Color(0xFF3E3A6D),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              stops: [0.1, 0.9],
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: TextFormField(
+                            maxLines: null,
+                            controller: descriptionController,
+                            decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                labelText: " To Do Description ",
+                                hintText: "Enter your to do description"),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      addTaskToFirebase();
-                      Navigator.pop(context);
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(const StadiumBorder()),
-                      fixedSize: MaterialStateProperty.all(
-                        const Size(120, 40),
+                    ElevatedButton(
+                      onPressed: () {
+                        addTaskToFirebase();
+                        Navigator.pop(context);
+                      },
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(const StadiumBorder()),
+                        fixedSize: MaterialStateProperty.all(
+                          const Size(120, 40),
+                        ),
+                      ),
+                      child: const Text(
+                        "Add",
+                        style: TextStyle(fontSize: 20.0),
                       ),
                     ),
-                    child: const Text(
-                      "Add",
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                  ),
-                ]),
+                  ]),
+                ),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       )),
     );
   }

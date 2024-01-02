@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:doal/pages/important_task_page.dart';
+import 'package:doal/pages/today_task_page.dart';
 import 'package:doal/pages/view_edit_todo.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
+import 'package:doal/utils/updateCheckValue.dart';
+import 'package:doal/widgets/error_loader_widget.dart';
 import 'package:doal/widgets/new_drawer.dart';
 import 'package:doal/widgets/to_do_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,11 +22,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String uid = '1';
+  int myIndex = 0;
+  List<String> appBarTitles = [
+    "Today's Tasks",
+    "All Tasks",
+    "Important Tasks",
+  ];
   bool checkvalue = false;
   @override
   void initState() {
-    getUid();
     super.initState();
+    getUid();
   }
 
   Future<void> getUid() async {
@@ -56,117 +64,119 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       appBar: AppBar(
-        title: const Text(
-          "Today's To Do",
-          style: TextStyle(
+        title: Text(
+          appBarTitles[myIndex],
+          style: const TextStyle(
               fontSize: 30.0,
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.w800),
         ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('Todo')
-            .doc(uid)
-            .collection('mytasks')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text('Error fetching data'),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text('No tasks available'),
-            );
-          } else {
-            final docs = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                var task = docs[index].data();
-                var taskId = docs[index].id; // Fetch the document ID as taskId
-                var dueDate = task['date']?.toString() ??
-                    ''; // Handle null with default value
-                var dueTime = task['time']?.toString() ??
-                    ''; // Handle null with default value
-                var taskTitle = task['title']?.toString() ??
-                    ''; // Handle null with default value
-                bool doneCheck = task['check'];
+      body: IndexedStack(index: myIndex, children: [
+        TodayTasksPage(),
+        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('Todo')
+              .doc(uid)
+              .collection('mytasks')
+              .orderBy('check')
+              .orderBy('date')
+              .orderBy('time')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text('Error fetching data'),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return ErrorLoaderWidget(
+                errorText: 'No tasks available',
+              );
+            } else {
+              final docs = snapshot.data!.docs;
+              return ListView.builder(
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  var task = docs[index].data();
+                  var taskId =
+                      docs[index].id; // Fetch the document ID as taskId
+                  var dueDate = task['date']?.toString() ??
+                      ''; // Handle null with default value
+                  var dueTime = task['time']?.toString() ??
+                      ''; // Handle null with default value
+                  var taskTitle = task['title']?.toString() ??
+                      ''; // Handle null with default value
+                  bool remCheck = task['remCheck'];
+                  bool impCheck = task['impCheck'];
+                  bool doneCheck = task['check'];
 
-              
-                return InkWell(
-                  onTap: () {
-                    if (taskId.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewToDoWidget(taskId: taskId),
-                        ),
-                      );
-                    } else {
-                      // Handle the case when taskId is empty
-                      // For example, show an error message or log an error
-                      Fluttertoast.showToast(msg: 'Can,t show');
-                    }
-                  },
-                  child: ToDoWidget(
-                    due_date: dueDate,
-                    due_time: dueTime,
-                    title: taskTitle,
-                    check: doneCheck,
-                    index: taskId,
-                    onChange: onChange,
-                  ),
-                );
-              },
-            );
-          }
-        },
-      ),
+                  return InkWell(
+                    onTap: () {
+                      if (taskId.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ViewToDoWidget(taskId: taskId),
+                          ),
+                        );
+                      } else {
+                        // Handle the case when taskId is empty
+                        // For example, show an error message or log an error
+                        Fluttertoast.showToast(msg: 'Can,t show');
+                      }
+                    },
+                    child: ToDoWidget(
+                      due_date: dueDate,
+                      due_time: dueTime,
+                      title: taskTitle,
+                      check: doneCheck,
+                      index: taskId,
+                      onChange: onChange,
+                      remCheck: remCheck,
+                      impCheck: impCheck,
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
+        ImportantTasksPage(),
+      ]),
       bottomNavigationBar: CurvedNavigationBar(
         items: const [
           Icon(Icons.calendar_view_day),
           Icon(Icons.all_inbox),
           Icon(Icons.home),
         ],
+        index: myIndex,
+        onTap: (index) {
+          setState(() {
+            myIndex = index;
+          });
+        },
         backgroundColor:
             MyTheme.MyThemeData().scaffoldBackgroundColor, //Color(0xff29274F),
         color: MyTheme.MyThemeData().primaryColor,
+        animationDuration: const Duration(milliseconds: 500),
       ),
     );
   }
 
   //to update checkvalue
-  Future<void> updateCheckValue(String taskId, bool newValue) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = auth.currentUser;
-
-    if (user != null) {
-      String uid = user.uid;
-
-      // Reference to the specific task document using the taskId obtained from the StreamBuilder
-      DocumentReference documentReference = FirebaseFirestore.instance
-          .collection('Todo')
-          .doc(uid)
-          .collection('mytasks')
-          .doc(taskId); 
-
-      // Update the 'check' field with the new value
-      await documentReference.update({'check': newValue});
-    }
-  }
 
   void onChange(String taskId) {
     setState(() {
       checkvalue = !checkvalue;
-      updateCheckValue(taskId, checkvalue);
+      EditOperations().updateCheckValue(taskId, checkvalue);
     });
   }
 }

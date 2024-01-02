@@ -1,4 +1,6 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doal/utils/myalarm.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -98,6 +100,16 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
         // Update the document with the modified data
         await documentReference.update(data);
         Fluttertoast.showToast(msg: 'Task Updated');
+      }
+      if (_remCheck) {
+        await AlarmManager.setAlarm(
+          widget.taskId,
+          _dateC.text,
+          _timeC.text,
+          titleController.text,
+        );
+      } else {
+        await AlarmManager.cancelAlarm(widget.taskId);
       }
     }
   }
@@ -210,18 +222,18 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
               ),
               onPressed: () {
                 deleteTask();
-                Navigator.pushNamed(context, MyRoutes.homeRoute);
+                Navigator.pop(context);
               })
         ],
       ),
       body: SafeArea(
-          child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 250,
-            ),
-            Container(
+          child: Column(
+        children: [
+          Container(
+            height: 250,
+          ),
+          Expanded(
+            child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -237,231 +249,235 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(children: [
-                  Text(
-                    edit ? "Editing Task" : "Viewing Task",
-                    style: const TextStyle(
-                        fontSize: 30.0,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: titleController,
-                      enabled: edit,
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    Text(
+                      edit ? "Editing Task" : "Viewing Task",
                       style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w600),
-                      decoration: InputDecoration(
-                        // Set consistent border for both enabled and disabled states
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
+                          fontSize: 30.0,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: titleController,
+                        enabled: edit,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                        decoration: InputDecoration(
+                          // Set consistent border for both enabled and disabled states
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50.0),
                           ),
-                        ),
-                        labelText: " title ",
-                        hintText: " your to do title",
-                        labelStyle: const TextStyle(
-                          color: Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                            borderSide: const BorderSide(
+                              color: Colors.white,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: " title ",
+                          hintText: " your to do title",
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.date_range_rounded),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Set Date",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        TextButton(
-                          onPressed:
-                              edit ? () => displayDatePicker(context) : null,
-                          child: Text(
-                            _dateC.text,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 18.0),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.date_range_rounded),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Icon(Icons.timer_sharp),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Set Time",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        TextButton(
+                          const Text("Set Date",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          TextButton(
                             onPressed:
-                                edit ? () => displayTimePicker(context) : null,
+                                edit ? () => displayDatePicker(context) : null,
                             child: Text(
-                              _timeC.text,
+                              _dateC.text,
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 18.0),
-                            ))
-                      ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.star_border_purple500_sharp),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Important",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        Transform.scale(
-                          scale: 0.6,
-                          child: IgnorePointer(
-                            ignoring: !edit,
-                            child: !_dataFetched
-                                ? CircularProgressIndicator()
-                                : LiteRollingSwitch(
-                                    value: _impCheck,
-                                    textOn: 'enabled',
-                                    textOff: 'disabled',
-                                    colorOn: Colors.greenAccent,
-                                    colorOff: Colors.redAccent,
-                                    iconOn: Icons.done,
-                                    iconOff: Icons.close,
-                                    textSize: 16.0,
-                                    onChanged:
-                                        ((p0) {}), // Empty function when 'edit' is false
-                                    onDoubleTap: () {},
-                                    onSwipe: edit
-                                        ? () {
-                                            setState(() {
-                                              _impCheck = !_impCheck;
-                                            });
-                                          }
-                                        : () {},
-                                    onTap: edit
-                                        ? () {
-                                            setState(() {
-                                              _impCheck = !_impCheck;
-                                            });
-                                          }
-                                        : () {}, // Empty function when 'edit' is false
-                                  ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Icon(Icons.timer_sharp),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        ),
-                      ],
+                          const Text("Set Time",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          TextButton(
+                              onPressed: edit
+                                  ? () => displayTimePicker(context)
+                                  : null,
+                              child: Text(
+                                _timeC.text,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 18.0),
+                              ))
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.alarm_on_outlined),
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        const Text("Remainder",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold)),
-                        Expanded(child: Container()),
-                        Transform.scale(
-                          scale: 0.6,
-                          child: IgnorePointer(
-                            ignoring: !edit,
-                            child: !_dataFetched
-                                ? CircularProgressIndicator()
-                                : LiteRollingSwitch(
-                                    value: _remCheck,
-                                    textOn: 'enabled',
-                                    textOff: 'disabled',
-                                    colorOn: Colors.greenAccent,
-                                    colorOff: Colors.redAccent,
-                                    iconOn: Icons.done,
-                                    iconOff: Icons.close,
-                                    textSize: 16.0,
-                                    onChanged:
-                                        ((p0) {}), // Empty function when 'edit' is false
-                                    onDoubleTap: () {},
-                                    onSwipe: edit
-                                        ? () {
-                                            setState(() {
-                                              _remCheck = !_remCheck;
-                                            });
-                                          }
-                                        : () {},
-                                    onTap: edit
-                                        ? () {
-                                            setState(() {
-                                              _remCheck = !_remCheck;
-                                            });
-                                          }
-                                        : () {}, // Empty function when 'edit' is false
-                                  ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star_border_purple500_sharp),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                        ),
-                      ],
+                          const Text("Important",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          Transform.scale(
+                            scale: 0.6,
+                            child: IgnorePointer(
+                              ignoring: !edit,
+                              child: !_dataFetched
+                                  ? CircularProgressIndicator()
+                                  : LiteRollingSwitch(
+                                      value: _impCheck,
+                                      textOn: 'enabled',
+                                      textOff: 'disabled',
+                                      colorOn: Colors.greenAccent,
+                                      colorOff: Colors.redAccent,
+                                      iconOn: Icons.done,
+                                      iconOff: Icons.close,
+                                      textSize: 16.0,
+                                      onChanged:
+                                          ((p0) {}), // Empty function when 'edit' is false
+                                      onDoubleTap: () {},
+                                      onSwipe: edit
+                                          ? () {
+                                              setState(() {
+                                                _impCheck = !_impCheck;
+                                              });
+                                            }
+                                          : () {},
+                                      onTap: edit
+                                          ? () {
+                                              setState(() {
+                                                _impCheck = !_impCheck;
+                                              });
+                                            }
+                                          : () {}, // Empty function when 'edit' is false
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 150.0,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF555294),
-                              Color(0xFF3E3A6D),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            stops: [0.1, 0.9],
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.alarm_on_outlined),
+                          const SizedBox(
+                            width: 10.0,
                           ),
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        child: TextFormField(
-                          maxLines: null,
-                          controller: descriptionController,
-                          enabled: edit,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          const Text("Remainder",
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          Expanded(child: Container()),
+                          Transform.scale(
+                            scale: 0.6,
+                            child: IgnorePointer(
+                              ignoring: !edit,
+                              child: !_dataFetched
+                                  ? CircularProgressIndicator()
+                                  : LiteRollingSwitch(
+                                      value: _remCheck,
+                                      textOn: 'enabled',
+                                      textOff: 'disabled',
+                                      colorOn: Colors.greenAccent,
+                                      colorOff: Colors.redAccent,
+                                      iconOn: Icons.done,
+                                      iconOff: Icons.close,
+                                      textSize: 16.0,
+                                      onChanged:
+                                          ((p0) {}), // Empty function when 'edit' is false
+                                      onDoubleTap: () {},
+                                      onSwipe: edit
+                                          ? () {
+                                              setState(() {
+                                                _remCheck = !_remCheck;
+                                              });
+                                            }
+                                          : () {},
+                                      onTap: edit
+                                          ? () {
+                                              setState(() {
+                                                _remCheck = !_remCheck;
+                                              });
+                                            }
+                                          : () {}, // Empty function when 'edit' is false
+                                    ),
+                            ),
                           ),
-                          decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              labelText: " To Do Description ",
-                              hintText: " your to do description"),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 150.0,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF555294),
+                                Color(0xFF3E3A6D),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              stops: [0.1, 0.9],
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: TextFormField(
+                            maxLines: null,
+                            controller: descriptionController,
+                            enabled: edit,
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                            decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                labelText: " To Do Description ",
+                                hintText: " your to do description"),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ]),
+                  ]),
+                ),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       )),
     );
   }
