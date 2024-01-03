@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String uid = '1';
   int myIndex = 0;
+  bool _isMounted = false;
   List<String> appBarTitles = [
     "Today's Tasks",
     "All Tasks",
@@ -31,8 +32,16 @@ class _HomePageState extends State<HomePage> {
   bool checkvalue = false;
   @override
   void initState() {
-    super.initState();
+    _isMounted = true;
+
     getUid();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
   }
 
   Future<void> getUid() async {
@@ -44,7 +53,7 @@ class _HomePageState extends State<HomePage> {
       await user.reload();
       final updatedUser = auth.currentUser;
 
-      if (updatedUser != null) {
+      if (_isMounted && updatedUser != null) {
         setState(() {
           uid = updatedUser.uid;
         });
@@ -153,9 +162,9 @@ class _HomePageState extends State<HomePage> {
       ]),
       bottomNavigationBar: CurvedNavigationBar(
         items: const [
-          Icon(Icons.calendar_view_day),
+          Icon(Icons.calendar_today),
           Icon(Icons.all_inbox),
-          Icon(Icons.home),
+          Icon(Icons.star),
         ],
         index: myIndex,
         onTap: (index) {

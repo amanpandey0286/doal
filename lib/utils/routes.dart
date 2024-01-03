@@ -4,4 +4,5 @@ class MyRoutes {
   static String homeRoute = "/home";
   static String addtodo = "/addtodo";
   static String viewtodo = "/viewtodo";
+  static String forgotpwd = "/forgotpwd";
 }

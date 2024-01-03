@@ -52,8 +52,7 @@ class _SignInPageState extends State<SignInPage> {
                         children: [
                           InkWell(
                               onTap: () async {
-                                await googleAuthClass.googleSignIn(
-                                    context, _emailController.toString());
+                                await googleAuthClass.googleSignIn(context);
                               },
                               child: const GoogleButton()),
                           const Text(
@@ -129,7 +128,10 @@ class _SignInPageState extends State<SignInPage> {
                             children: [
                               Expanded(child: SizedBox()),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, MyRoutes.forgotpwd);
+                                },
                                 child: const Text(
                                   "Forgot Password?",
                                   style: TextStyle(
@@ -181,8 +183,11 @@ class _SignInPageState extends State<SignInPage> {
                                 setState(() {
                                   circular = false;
                                 });
-                                Navigator.pushNamed(
-                                    context, MyRoutes.homeRoute);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  MyRoutes.homeRoute,
+                                  (route) => false, // Replace the entire stack
+                                );
                               } catch (e) {
                                 final snackbar =
                                     SnackBar(content: Text(e.toString()));

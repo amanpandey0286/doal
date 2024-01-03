@@ -1,9 +1,9 @@
+import 'package:doal/pages/forgot_pwd_page.dart';
 import 'package:doal/pages/home_page.dart';
 import 'package:doal/pages/sign_in_page.dart';
 import 'package:doal/pages/sign_up_page.dart';
 import 'package:doal/pages/to_do_add_page.dart';
 import 'package:doal/pages/view_edit_todo.dart';
-import 'package:doal/utils/myalarm.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -11,43 +11,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:lottie/lottie.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:timezone/data/latest_10y.dart' as tz;
+
+FlutterLocalNotificationsPlugin notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  InitializationSettings initializationSettings =
+      InitializationSettings(android: androidSettings);
+  bool? initialized =
+      await notificationsPlugin.initialize(initializationSettings);
+  notificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()!
+      .requestNotificationsPermission();
   await Firebase.initializeApp();
-  await AndroidAlarmManager.initialize();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle.dark.copyWith(
       systemNavigationBarColor:
           Colors.black, // Set the navigation bar background color
     ),
   );
-  AwesomeNotifications().initialize(
-      null,
-      [
-        NotificationChannel(
-            channelGroupKey: 'basic_channel_group',
-            channelKey: 'basic_channel',
-            channelName: 'Basic notifications',
-            channelDescription: 'Notification channel for basic tests',
-            defaultColor: Color(0xFF9D50DD),
-            ledColor: Colors.white)
-      ],
-      // Channel groups are only visual and are not required
-      channelGroups: [
-        NotificationChannelGroup(
-            channelGroupKey: 'basic_channel_group',
-            channelGroupName: 'Basic group')
-      ],
-      debug: true);
-  bool isAllowedToSendNotification =
-      await AwesomeNotifications().isNotificationAllowed();
-  if (!isAllowedToSendNotification) {
-    AwesomeNotifications().requestPermissionToSendNotifications();
-  }
+
   runApp(const MyApp());
 }
 
@@ -68,16 +59,6 @@ class _MyAppState extends State<MyApp> {
         _connectivityResult = result;
       });
     });
-
-    AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:
-            NotificationController.onNotificationCreatedMethod,
-        onNotificationDisplayedMethod:
-            NotificationController.onNotificationDisplayedMethod,
-        onDismissActionReceivedMethod:
-            NotificationController.onDismissActionReceivedMethod);
-    super.initState();
   }
 
   Future<void> initConnectivity() async {
@@ -127,6 +108,7 @@ class _MyAppState extends State<MyApp> {
             ),
         MyRoutes.signInRoute: (context) => const SignInPage(),
         MyRoutes.addtodo: (context) => const AddToDoWidget(),
+        MyRoutes.forgotpwd: (context) => const ForgotPasseordPage(),
         MyRoutes.viewtodo: (context) => const ViewToDoWidget(
               taskId: '',
             ),

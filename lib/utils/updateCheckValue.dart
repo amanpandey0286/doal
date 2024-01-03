@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class EditOperations {
   //to update checkvalue
@@ -19,7 +18,20 @@ class EditOperations {
           .doc(taskId);
 
       // Update the 'check' field with the new value
-      await documentReference.update({'check': newValue});
+      if (newValue) {
+        await documentReference.update({
+          'check': newValue,
+          'remCheck': false,
+          // Set remCheck to false when check becomes true
+        });
+      } else {
+        await documentReference.update({
+          'check': newValue,
+          // Set remCheck to false when check becomes true
+        });
+      }
     }
   }
+
+  
 }

@@ -1,5 +1,5 @@
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doal/main.dart';
 import 'package:doal/utils/myalarm.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/utils/theme.dart';
@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+import 'package:lottie/lottie.dart';
+import 'dart:convert';
 
 class ViewToDoWidget extends StatefulWidget {
   final String taskId;
@@ -101,15 +103,21 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
         await documentReference.update(data);
         Fluttertoast.showToast(msg: 'Task Updated');
       }
+
       if (_remCheck) {
-        await AlarmManager.setAlarm(
-          widget.taskId,
-          _dateC.text,
-          _timeC.text,
-          titleController.text,
-        );
+        // Fetch the title and time
+        int notificationId = MyNotification()
+            .getNotificationId(widget.taskId); // Pass taskId here
+        String title = titleController.text;
+        String time = _timeC.text;
+        String date = _dateC.text;
+
+        // Schedule notification
+        MyNotification().showNotification(notificationId, title, time, date);
       } else {
-        await AlarmManager.cancelAlarm(widget.taskId);
+        // Cancel notification with the same ID when remCheck is false
+        notificationsPlugin
+            .cancel(MyNotification().getNotificationId(widget.taskId));
       }
     }
   }
@@ -129,6 +137,10 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
           .doc(widget.taskId); // Use the passed task ID
 
       DocumentSnapshot taskSnapshot = await documentReference.get();
+      if (_remCheck) {
+        notificationsPlugin
+            .cancel(MyNotification().getNotificationId(widget.taskId));
+      }
 
       if (taskSnapshot.exists) {
         // Delete the document from Firestore
@@ -166,7 +178,8 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
 
     if (time != null) {
       setState(() {
-        _timeC.text = "${time.hour}:${time.minute}";
+        _timeC.text =
+            "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -229,8 +242,9 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
       body: SafeArea(
           child: Column(
         children: [
-          Container(
+          SizedBox(
             height: 250,
+            child: Lottie.asset('assets/images/add_task.json'),
           ),
           Expanded(
             child: Container(
@@ -280,8 +294,8 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                               width: 2.0,
                             ),
                           ),
-                          labelText: " title ",
-                          hintText: " your to do title",
+                          labelText: "Task title ",
+                          hintText: " your task title",
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
@@ -466,8 +480,8 @@ class _ViewToDoWidgetState extends State<ViewToDoWidget> {
                             ),
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                labelText: " To Do Description ",
-                                hintText: " your to do description"),
+                                labelText: " Task Description ",
+                                hintText: " Your Task description"),
                           ),
                         ),
                       ),

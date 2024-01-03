@@ -1,4 +1,3 @@
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doal/utils/myalarm.dart';
 import 'package:doal/utils/routes.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+import 'package:lottie/lottie.dart';
 
 class AddToDoWidget extends StatefulWidget {
   const AddToDoWidget({super.key});
@@ -49,12 +49,14 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
 
       Fluttertoast.showToast(msg: 'Data Added');
       if (remCheck) {
-        await AlarmManager.setAlarm(
-          taskId,
-          _dateC.text,
-          _timeC.text,
-          titleController.text,
-        );
+        // Fetch the title and time
+        int notficationId = MyNotification().getNotificationId(taskId);
+        String title = titleController.text;
+        String time = _timeC.text;
+        String date = _dateC.text;
+
+        // Schedule notification
+        MyNotification().showNotification(notficationId, title, time, date);
       }
     }
   }
@@ -74,7 +76,7 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
   ///Date
   DateTime selected = DateTime.now();
   DateTime initial = DateTime(2000);
-  DateTime last = DateTime(2025);
+  DateTime last = DateTime(2050);
 
   ///Time
   TimeOfDay timeOfDay = TimeOfDay.now();
@@ -99,7 +101,8 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
 
     if (time != null) {
       setState(() {
-        _timeC.text = "${time.hour}:${time.minute}";
+        _timeC.text =
+            "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -110,8 +113,9 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
       body: SafeArea(
           child: Column(
         children: [
-          Container(
+          SizedBox(
             height: 250,
+            child: Lottie.asset('assets/images/add_task.json'),
           ),
           Expanded(
             child: Container(
@@ -156,8 +160,8 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                             ),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50.0)),
-                            labelText: " Todo title ",
-                            hintText: "Enter your to do title"),
+                            labelText: " Task title ",
+                            hintText: "Enter your task title"),
                       ),
                     ),
                     Padding(
@@ -299,8 +303,8 @@ class _AddToDoWidgetState extends State<AddToDoWidget> {
                             controller: descriptionController,
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                labelText: " To Do Description ",
-                                hintText: "Enter your to do description"),
+                                labelText: " Task Description ",
+                                hintText: "Enter your Task description"),
                           ),
                         ),
                       ),

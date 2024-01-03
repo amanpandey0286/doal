@@ -1,5 +1,7 @@
+import 'package:doal/utils/auth.dart';
 import 'package:doal/utils/routes.dart';
 import 'package:doal/widgets/common_widget.dart';
+import 'package:doal/widgets/google_button.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 
@@ -15,9 +17,10 @@ class _SignUpPageState extends State<SignUpPage> {
       firebase_auth.FirebaseAuth.instance; // objext of firebase auth
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
   bool circular = false;
   bool _isObscure = true;
+
+  GoogleAuthClass googleAuthClass = GoogleAuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -48,31 +51,17 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: SingleChildScrollView(
                   child: Form(
                     child: Column(children: [
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                              borderSide: BorderSide(
-                                color: Colors.white30,
-                                width: 2.0,
-                              ),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                            labelText: "Name",
-                            hintText: "Enter your name"),
-                        keyboardType: TextInputType.emailAddress,
-                        key: const ValueKey('username'),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Incorrect Username';
-                          }
-                          return null;
-                        },
+                      InkWell(
+                          onTap: () async {
+                            await googleAuthClass.googleSignIn(context);
+                          },
+                          child: const GoogleButton()),
+                      const Text(
+                        "OR",
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(
-                        height: 10.0,
+                        height: 8,
                       ),
                       TextFormField(
                         controller: _emailController,
@@ -184,7 +173,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             setState(() {
                               circular = false;
                             });
-                            Navigator.pushNamed(context, MyRoutes.homeRoute);
+                            Navigator.pushReplacementNamed(
+                                context, MyRoutes.homeRoute);
                           } catch (e) {
                             final snackbar =
                                 SnackBar(content: Text(e.toString()));
